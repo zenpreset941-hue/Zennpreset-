@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZenMethod</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f2f5f3; --surface:#ffffff; --surface2:#ebf0ed; --text:#17201e; --muted:#5a6764;
+  --line:#dbe3df; --accent:#1d6b63; --accent2:#2a9187; --accent-text:#ffffff; --ok:#2f6b44; --warn:#8a6a2a; --bad:#9a3b3b;
+  --sk1:#e3e9e6; --sk2:#f2f5f3; --navbg:rgba(242,245,243,.86); --shadow:0 1px 2px rgba(18,32,29,.05),0 16px 36px -18px rgba(18,32,29,.22);
+  --glow1:rgba(42,145,135,.16); --glow2:rgba(214,176,96,.14);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0e1514; --surface:#162120; --surface2:#1e2b2a; --text:#e5ecea; --muted:#92a39f;
+    --line:#293a37; --accent:#5fc2b6; --accent2:#86dccf; --accent-text:#06201d; --ok:#8fcfa0; --warn:#d6b878; --bad:#dba3a3;
+    --sk1:#1e2b2a; --sk2:#2b3b39; --navbg:rgba(14,21,20,.86); --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 36px -18px rgba(0,0,0,.7);
+    --glow1:rgba(95,194,182,.12); --glow2:rgba(214,176,96,.07);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0e1514; --surface:#162120; --surface2:#1e2b2a; --text:#e5ecea; --muted:#92a39f;
+  --line:#293a37; --accent:#5fc2b6; --accent2:#86dccf; --accent-text:#06201d; --ok:#8fcfa0; --warn:#d6b878; --bad:#dba3a3;
+  --sk1:#1e2b2a; --sk2:#2b3b39; --navbg:rgba(14,21,20,.86); --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 36px -18px rgba(0,0,0,.7);
+  --glow1:rgba(95,194,182,.12); --glow2:rgba(214,176,96,.07);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:28px 18px 64px}
+header{padding:20px 0 8px}
+.eyebrow{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.2;margin:6px 0 10px;font-weight:650}
+h2{font-size:21px;margin:0 0 6px;font-weight:600}
+p{margin:0 0 12px}
+.lead{color:var(--muted);max-width:60ch}
+section{margin-top:36px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+.muted{color:var(--muted)}
+.note{border-left:3px solid var(--accent);padding:4px 0 4px 14px;margin:16px 0;color:var(--muted)}
+
+/* skeleton */
+.sk{background:linear-gradient(90deg,var(--sk1),var(--sk2),var(--sk1));background-size:200% 100%;animation:sh 1.4s ease-in-out infinite;border-radius:6px}
+@keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
+@media (prefers-reduced-motion: reduce){.sk{animation:none}}
+.sk-line{height:14px;margin:10px 0}
+.sk-title{height:22px;width:45%;margin-bottom:14px}
+.sk-block{height:120px}
+[hidden]{display:none!important}
+
+/* analyzer */
+.drop{display:block;border:1.5px dashed var(--line);border-radius:12px;padding:28px 16px;text-align:center;cursor:pointer;background:var(--surface2);transition:border-color .15s}
+.drop:hover,.drop.over{border-color:var(--accent)}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.btn{display:inline-block;background:var(--accent);color:var(--accent-text);border:0;border-radius:8px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn:focus-visible,.drop:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:14px 0}
+.stat{background:var(--surface2);border-radius:8px;padding:12px}
+.stat b{display:block;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat span{font-size:18px;font-weight:600}
+.checks{list-style:none;padding:0;margin:10px 0 0}
+.checks li{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.tag{flex:none;font-size:12px;font-weight:700;border:1px solid currentColor;border-radius:4px;padding:1px 7px;height:22px;margin-top:2px}
+.t-ok{color:var(--ok)} .t-warn{color:var(--warn)} .t-bad{color:var(--bad)}
+
+/* table */
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:480px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+
+/* steps */
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:0}
+ol.steps li{counter-increment:s;position:relative;padding:14px 0 14px 46px;border-top:1px solid var(--line)}
+ol.steps li:first-child{border-top:0}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:14px;width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;font-weight:600;font-size:14px}
+ol.steps b{display:block}
+
+pre{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:14px;overflow-x:auto;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:10px 0}
+details{border-top:1px solid var(--line);padding:12px 0}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600}
+details p{margin:8px 0 0;color:var(--muted)}
+footer{margin-top:44px;color:var(--muted);font-size:14px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0}
+.opts label{display:block;font-size:13px;color:var(--muted)}
+select{display:block;width:100%;margin-top:4px;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);color:var(--text);font:inherit}
+.bar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;margin:12px 0 6px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.phone{width:150px;aspect-ratio:9/16;border-radius:10px}
+.proc-wrap{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-top:16px}
+.proc-wrap>div{flex:1;min-width:200px}
+#pVideo{max-width:240px;width:100%;border-radius:10px;background:#000;display:block;margin:12px 0}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+a.btn{text-decoration:none}
+.vh{position:absolute;opacity:0;width:1px;height:1px}
+.topbar{display:flex;justify-content:flex-end}
+.ov{position:fixed;inset:0;z-index:100;background:rgba(10,12,14,.62);display:grid;place-items:center;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.ov-card{width:100%;max-width:620px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;max-height:100%;overflow:auto}
+.ov-head{display:flex;justify-content:space-between;align-items:baseline;font-size:18px;margin-bottom:14px}
+.ov-head span{font-variant-numeric:tabular-nums;color:var(--muted)}
+.ov-body{display:flex;gap:20px;flex-wrap:wrap}
+.ov-prev{flex:none;width:170px}
+.phone-lg{width:170px;aspect-ratio:9/16;border-radius:10px;display:block}
+#ovCanvas{width:170px;aspect-ratio:9/16;border-radius:10px;display:block;background:#000}
+.ov-side{flex:1;min-width:200px}
+.ov-steps{list-style:none;margin:0 0 14px;padding:0}
+.ov-steps li{position:relative;padding:7px 0 7px 28px;color:var(--muted)}
+.ov-steps li::before{content:"";position:absolute;left:0;top:11px;width:14px;height:14px;border-radius:50%;border:2px solid var(--line)}
+.ov-steps li.on{color:var(--text);font-weight:600}
+.ov-steps li.on::before{border-color:var(--accent);border-top-color:transparent;animation:spin .9s linear infinite}
+.ov-steps li.done{color:var(--text)}
+.ov-steps li.done::before{background:var(--accent);border-color:var(--accent)}
+.ov-foot{margin-top:16px;text-align:right}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.ov-steps li.on::before{animation:none}}
+
+/* ===== tampilan baru ===== */
+html{scroll-behavior:smooth}
+body{background-color:var(--bg);background-image:radial-gradient(900px 440px at 88% -120px,var(--glow1),transparent 70%),radial-gradient(700px 420px at -8% 40px,var(--glow2),transparent 70%);background-repeat:no-repeat}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:10px 18px;margin:0 -18px;background:var(--navbg);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.01em;margin-right:auto}
+.brand svg{width:26px;height:26px;flex:none}
+.links{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;order:3;width:100%}
+.links::-webkit-scrollbar{display:none}
+.links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:600;padding:7px 13px;border-radius:99px;white-space:nowrap;transition:background .15s,color .15s}
+.links a:hover{background:var(--surface2);color:var(--text)}
+@media (min-width:720px){.links{order:0;width:auto}.brand{margin-right:0}.nav .btn{margin-left:auto}}
+.nav .btn{padding:7px 14px;font-size:13px;border-radius:99px}
+.hero{padding:46px 0 10px}
+.hero h1{font-size:clamp(36px,8vw,60px);letter-spacing:-.025em;line-height:1.05;margin:8px 0 14px;font-weight:750;color:var(--text);background:linear-gradient(115deg,var(--text) 30%,var(--accent) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero .lead{font-size:17px;max-width:62ch}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:5px 12px}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.chip{font-size:13px;font-weight:550;padding:7px 13px;border-radius:99px;background:var(--surface);border:1px solid var(--line);color:var(--muted);text-decoration:none;transition:border-color .15s,color .15s,transform .15s}
+.chip:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
+section{margin-top:44px;scroll-margin-top:96px}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#content section{animation:rise .5s ease both}
+#content section:nth-child(2){animation-delay:.05s}#content section:nth-child(3){animation-delay:.1s}
+@media (prefers-reduced-motion: reduce){#content section{animation:none}html{scroll-behavior:auto}}
+.sec-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.sec-no{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-weight:750;font-size:14px;color:var(--accent-text);background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 18px -8px var(--accent)}
+.sec-head h2{margin:0 0 4px}
+.sec-head p{margin:0}
+h2{font-size:22px;letter-spacing:-.01em}
+.card{border-radius:20px;padding:22px;box-shadow:var(--shadow)}
+.note{border-left:0;background:var(--surface2);border-radius:12px;padding:12px 16px;margin:16px 0 0;font-size:14.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;padding:11px 20px;box-shadow:0 8px 18px -10px var(--accent);transition:transform .12s,box-shadow .15s,filter .15s}
+.btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 12px 22px -10px var(--accent)}
+.btn:active:not(:disabled){transform:translateY(0) scale(.98)}
+.btn.ghost{background:var(--surface);box-shadow:none;border:1px solid var(--line);color:var(--text)}
+.btn.ghost:hover:not(:disabled){border-color:var(--accent);filter:none;box-shadow:none}
+.drop{border-radius:16px;border-width:2px;padding:34px 16px;background:linear-gradient(180deg,var(--surface2),var(--surface));transition:border-color .15s,transform .15s}
+.drop:hover,.drop.over{transform:translateY(-1px)}
+.drop svg{width:38px;height:38px;color:var(--accent);margin-bottom:8px}
+.stat{border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+select{border-radius:10px}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.bar{height:10px}
+.bar i{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+th{background:var(--surface2)}
+th:first-child{border-top-left-radius:10px}th:last-child{border-top-right-radius:10px}
+details{border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:10px;background:var(--surface)}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--accent);font-weight:700;transition:transform .2s}
+details[open] summary::after{content:"\2212"}
+ol.steps li::before{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--accent-text);border:0}
+.ov-card{border-radius:20px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);text-align:center}
+
+/* foto ke vektor */
+.vec-compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0 6px}
+.vec-cap{font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.vec-box{background:repeating-conic-gradient(var(--surface2) 0% 25%,var(--surface) 0% 50%) 50%/16px 16px;border:1px solid var(--line);border-radius:14px;padding:8px;display:grid;place-items:center;min-height:200px}
+.vec-box img{max-width:100%;max-height:380px;display:block;border-radius:8px}
+.vec-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.vec-badge{display:inline-block;font-size:12px;font-weight:650;color:var(--accent);background:var(--surface2);border-radius:99px;padding:3px 10px;margin-left:8px;vertical-align:middle}
+.small{font-size:14px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav" aria-label="Navigasi utama">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="gEn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--accent2)"/></linearGradient></defs><path d="M16 4.5a11.5 11.5 0 1 0 10.9 7.8" fill="none" stroke="url(#gEn)" stroke-width="3.2" stroke-linecap="round"/></svg>
+      ZenMethod
+    </div>
+    <div class="links">
+      <a href="#analyzer">Periksa</a><a href="#proses">Proses video</a><a href="#vektor">Foto ke vektor</a><a href="#panduan">Panduan</a>
+    </div>
+    <button class="btn ghost" id="themeBtn" type="button">Tema: Otomatis</button>
+  </nav>
+
+  <header class="hero">
+    <span class="eyebrow">Alat kualitas video dan vektor</span>
+    <h1>ZenMethod</h1>
+    <p class="lead">Siapkan video agar kualitasnya turun seminimal mungkin saat diunggah ke TikTok, dan ubah foto menjadi vektor SVG atau XML yang terpisah per bagian untuk diedit di Alight Motion. Semua berjalan di peramban Anda, tanpa unggah ke server.</p>
+    <div class="chips"><a class="chip" href="#analyzer">Periksa video</a><a class="chip" href="#proses">1080 x 1920 H.264</a><a class="chip" href="#vektor">Foto ke SVG dan XML</a></div>
+  </header>
+
+  <!-- skeleton awal -->
+  <div id="pageSkeleton" aria-busy="true" aria-label="Memuat konten">
+    <section><div class="card"><div class="sk sk-title"></div><div class="sk sk-block"></div></div></section>
+    <section><div class="card"><div class="sk sk-title"></div><div class="sk sk-line"></div><div class="sk sk-line" style="width:90%"></div><div class="sk sk-line" style="width:75%"></div><div class="sk sk-line" style="width:85%"></div></div></section>
+    <section><div class="card"><div class="sk sk-title"></div><div class="sk sk-line"></div><div class="sk sk-line" style="width:80%"></div><div class="sk sk-line" style="width:92%"></div></div></section>
+  </div>
+
+  <main id="content" hidden>
+    <section id="analyzer">
+      <div class="sec-head"><span class="sec-no">01</span><div><h2>Periksa video Anda</h2>
+      <p class="muted">Pilih file video untuk melihat apakah resolusi, rasio, dan bitrate-nya sudah ideal. File tidak diunggah ke server mana pun; pemeriksaan dilakukan di perangkat Anda.</p></div></div>
+      <div class="card">
+        <label class="drop" id="drop" for="file">
+          <input type="file" id="file" accept="video/*">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><br><strong>Pilih atau seret file video ke sini</strong>
+          <div class="muted" style="font-size:14px;margin-top:4px">Format MP4 atau MOV</div>
+        </label>
+
+        <div id="anSkeleton" hidden aria-busy="true">
+          <div class="grid">
+            <div class="sk" style="height:62px"></div><div class="sk" style="height:62px"></div>
+            <div class="sk" style="height:62px"></div><div class="sk" style="height:62px"></div>
+          </div>
+          <div class="sk sk-line"></div><div class="sk sk-line" style="width:85%"></div><div class="sk sk-line" style="width:70%"></div>
+        </div>
+
+        <div id="result" hidden>
+          <p style="margin:16px 0 0"><strong id="fname"></strong></p>
+          <div class="grid" id="stats"></div>
+          <ul class="checks" id="checks"></ul>
+          <button class="btn ghost" id="reset" type="button" style="margin-top:14px">Periksa video lain</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="proses">
+      <div class="sec-head"><span class="sec-no">02</span><div><h2>Proses video dengan method</h2>
+      <p class="muted">Video akan dikonversi ulang menjadi 1080 x 1920, H.264 (MP4), dengan bitrate pilihan Anda, lalu bisa diunduh dan diunggah ke TikTok. Seluruh proses berjalan di peramban Anda.</p></div></div>
+      <div class="card">
+        <div class="row">
+          <label class="btn ghost" for="pFile" style="cursor:pointer">Pilih video</label>
+          <input type="file" id="pFile" class="vh" accept="video/*">
+          <span id="pName" class="muted">Belum ada video dipilih</span>
+        </div>
+        <div class="opts">
+          <label>Bitrate video<select id="pBitrate"><option value="12">12 Mbps</option><option value="16" selected>16 Mbps</option><option value="20">20 Mbps</option></select></label>
+          <label>Frame rate<select id="pFps"><option value="30" selected>30 fps</option><option value="60">60 fps</option></select></label>
+          <label>Penyesuaian rasio<select id="pFit"><option value="fit">Pas dengan bingkai hitam</option><option value="crop">Penuhi layar (dipotong)</option></select></label>
+        </div>
+        <button class="btn" id="pStart" type="button" disabled>Mulai proses</button>
+
+        <div id="pProg" hidden aria-busy="true">
+          <div class="proc-wrap">
+            <div class="sk phone"></div>
+            <div>
+              <div class="sk sk-title"></div>
+              <div class="bar"><i id="pBar"></i></div>
+              <div class="muted" id="pTxt" role="status">Menyiapkan</div>
+              <div class="sk sk-line" style="margin-top:16px"></div><div class="sk sk-line" style="width:70%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="pOut" hidden>
+          <div class="proc-wrap">
+            <video id="pVideo" controls playsinline></video>
+            <div>
+              <p><strong>Video siap diunggah</strong></p>
+              <p class="muted" id="pInfo"></p>
+              <a class="btn" id="pDl" href="#">Unduh video</a>
+              <p class="muted" id="pWarn" hidden style="margin-top:12px">Peramban Anda menghasilkan format WebM. TikTok lebih aman dengan MP4, jadi konversikan dengan perintah FFmpeg di bawah atau gunakan Chrome atau Edge terbaru.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="note">Video tidak diputar selama proses: setiap frame diambil satu per satu pada waktunya, lalu dienkode. Karena itu tidak ada frame yang terlewat dan hasilnya lancar walau perangkat lambat. Waktu proses bergantung perangkat, biasanya sekitar 0,5 sampai 3 kali durasi video. Durasi dan suara hasil tetap sama dengan video asli. Jangan pindah tab dan jangan tutup halaman selama berjalan; di Android biarkan layar tetap menyala (halaman otomatis meminta layar tidak mati). Gunakan Chrome atau Edge terbaru. Untuk hasil terbaik, perintah FFmpeg di bawah tetap lebih akurat.</div>
+      </div>
+    </section>
+
+    <section id="vektor">
+      <div class="sec-head"><span class="sec-no">03</span><div><h2>Foto ke vektor (SVG dan XML)<span class="vec-badge">Alight Motion</span></h2>
+      <p class="muted">Foto diubah menjadi bentuk vektor yang dipisah per bagian warna dan area, sehingga di Alight Motion tiap bagian menjadi lapisan bentuk yang bisa digeser, diwarnai, dan dianimasikan sendiri. Foto tidak diunggah ke mana pun.</p></div></div>
+      <div class="card">
+        <div class="row">
+          <label class="btn ghost" for="vFile" style="cursor:pointer">Pilih foto</label>
+          <input type="file" id="vFile" class="vh" accept="image/*">
+          <span id="vName" class="muted">Belum ada foto dipilih</span>
+        </div>
+        <div class="opts">
+          <label>Tingkat detail<select id="vDetail"><option value="low">Rendah (ringan, sedikit bagian)</option><option value="mid" selected>Sedang</option><option value="high">Tinggi (banyak bagian)</option></select></label>
+          <label>Jumlah warna<select id="vColors"><option value="6">6 warna</option><option value="12">12 warna</option><option value="16" selected>16 warna</option><option value="24">24 warna</option><option value="32">32 warna</option></select></label>
+          <label>Bentuk tepi<select id="vEdge"><option value="smooth" selected>Halus (kurva)</option><option value="sharp">Tajam (garis lurus)</option></select></label>
+          <label>Celah antar bagian<select id="vSeam"><option value="1" selected>Tutup otomatis</option><option value="0">Biarkan</option></select></label>
+        </div>
+        <button class="btn" id="vStart" type="button" disabled>Ubah ke vektor</button>
+
+        <div id="vProg" hidden aria-busy="true" style="margin-top:16px">
+          <div class="bar"><i id="vBar"></i></div>
+          <div class="muted" id="vTxt" role="status">Menyiapkan</div>
+        </div>
+
+        <div id="vOut" hidden>
+          <div class="vec-compare">
+            <div><div class="vec-cap">Foto asli</div><div class="vec-box"><img id="vOrig" alt="Foto asli"></div></div>
+            <div><div class="vec-cap">Hasil vektor</div><div class="vec-box"><img id="vPrev" alt="Pratinjau hasil vektor"></div></div>
+          </div>
+          <div class="grid" id="vStats"></div>
+          <p class="muted small" id="vWarn" hidden></p>
+          <div class="vec-actions">
+            <a class="btn" id="vDlSvg" href="#">Unduh SVG</a>
+            <a class="btn" id="vDlXml" href="#">Unduh XML</a>
+            <button class="btn ghost" id="vCopy" type="button">Salin kode</button>
+            <span class="muted" id="vCopied" role="status"></span>
+          </div>
+        </div>
+
+        <div class="note"><b>Cara memakai di Alight Motion:</b> unduh file SVG, buka proyek, ketuk tombol tambah, pilih media atau berkas, lalu pilih file tersebut. Tiap bagian akan menjadi bentuk vektor sendiri. File XML isinya sama persis dengan SVG (SVG memang berformat XML); pakai itu bila aplikasi atau perangkat Anda menolak ekstensi .svg. Bila editor lambat, pilih tingkat detail Rendah atau kurangi jumlah warna. Hasil ini adalah penelusuran otomatis, jadi bentuknya mendekati foto, bukan identik.</div>
+      </div>
+    </section>
+
+    <section id="panduan">
+      <h2>Pengaturan ekspor yang disarankan</h2>
+      <p class="muted">Gunakan nilai ini di aplikasi editor Anda sebelum mengekspor.</p>
+      <div class="card tablewrap">
+        <table>
+          <thead><tr><th>Parameter</th><th>Nilai</th><th>Alasan</th></tr></thead>
+          <tbody>
+            <tr><td>Resolusi</td><td>1080 x 1920</td><td>Sama dengan resolusi tampilan TikTok, sehingga tidak ada penskalaan ulang.</td></tr>
+            <tr><td>Rasio</td><td>9:16</td><td>Rasio lain akan diberi bingkai atau dipotong.</td></tr>
+            <tr><td>Frame rate</td><td>30 fps (atau 60 fps bila sumber memang 60)</td><td>Jangan mengubah frame rate sumber secara paksa.</td></tr>
+            <tr><td>Codec video</td><td>H.264 (AVC), profil High</td><td>Paling kompatibel dan paling stabil di proses konversi TikTok.</td></tr>
+            <tr><td>Bitrate video</td><td>12 sampai 20 Mbps</td><td>Cukup tinggi untuk detail, tidak terlalu besar sehingga memicu kompresi agresif.</td></tr>
+            <tr><td>Codec audio</td><td>AAC, 256 kbps, 48 kHz</td><td>Audio kualitas tinggi dan standar.</td></tr>
+            <tr><td>Kontainer</td><td>MP4 dengan faststart</td><td>Metadata di awal file agar pemrosesan lebih lancar.</td></tr>
+            <tr><td>Ruang warna</td><td>SDR, yuv420p</td><td>HDR sering berubah warna setelah dikonversi.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Langkah-langkah</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><b>Ekspor dari editor dengan pengaturan di atas</b>Hindari preset yang bernama "kompres" atau "ukuran kecil". Jika editor menyediakan mode bitrate target, isi 16 Mbps.</li>
+          <li><b>Pindahkan file tanpa melalui aplikasi chat</b>WhatsApp, Telegram versi kompres, dan sejenisnya menurunkan kualitas video. Gunakan kabel, AirDrop, atau Google Drive.</li>
+          <li><b>Aktifkan unggah kualitas tinggi di TikTok</b>Buka Profil, menu Pengaturan dan privasi, lalu Hemat data (atau Data Saver), dan pastikan mode hemat data mati serta opsi unggah HD aktif bila tersedia di versi aplikasi Anda.</li>
+          <li><b>Unggah dengan koneksi stabil</b>Gunakan Wi-Fi. Unggah yang terputus dan diulang dapat menghasilkan hasil yang lebih buruk.</li>
+          <li><b>Jangan unduh ulang lalu unggah lagi</b>Setiap putaran unduh dan unggah menambah satu lapis kompresi. Simpan selalu file master.</li>
+          <li><b>Hindari tambahan efek dalam aplikasi TikTok</b>Teks, filter, dan efek yang ditambahkan di dalam aplikasi memicu render ulang. Lakukan semuanya di editor sebelum ekspor.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section>
+      <h2>Perintah FFmpeg</h2>
+      <p class="muted">Bagi yang memakai FFmpeg, perintah berikut menghasilkan file dengan pengaturan yang disarankan.</p>
+      <div class="card">
+        <pre id="cmd">ffmpeg -i input.mp4 \
+  -vf "scale=1080:1920:force_original_aspect_ratio=decrease:flags=lanczos,pad=1080:1920:(ow-iw)/2:(oh-ih)/2" \
+  -r 30 -c:v libx264 -preset slow -profile:v high \
+  -b:v 16M -maxrate 20M -bufsize 32M -pix_fmt yuv420p \
+  -c:a aac -b:a 256k -ar 48000 \
+  -movflags +faststart output.mp4</pre>
+        <button class="btn" id="copy" type="button">Salin perintah</button>
+        <span class="muted" id="copied" style="margin-left:10px" role="status"></span>
+      </div>
+      <div class="note">Hasil akhir tetap bergantung pada kebijakan TikTok yang dapat berubah sewaktu-waktu. Metode ini mengurangi, bukan meniadakan, kompresi.</div>
+    </section>
+
+    <section>
+      <h2>Pertanyaan umum</h2>
+      <details><summary>Mengapa bitrate yang terlalu tinggi tidak membantu?</summary><p>TikTok akan mengonversi ulang ke bitrate targetnya sendiri. File yang jauh lebih besar dari kebutuhan hanya memperlama unggah dan dapat memicu kompresi lebih kasar.</p></details>
+      <details><summary>Apakah 4K lebih baik?</summary><p>Tidak untuk tujuan ini. Video 4K akan diperkecil oleh TikTok, dan proses penskalaan tersebut sering menambah kehilangan detail. Resolusi 1080 x 1920 lebih aman.</p></details>
+      <details><summary>Video saya terlihat kabur padahal sudah sesuai pengaturan?</summary><p>Periksa apakah sumber video sudah tajam. Noise, grain berlebih, dan gerakan cepat dengan banyak detail halus paling sulit dipertahankan oleh kompresi. Coba kurangi grain dan tambahkan penajaman ringan sebelum ekspor.</p></details>
+      <details><summary>Apakah pengaturan ini berlaku untuk Reels dan Shorts?</summary><p>Prinsipnya serupa karena platform tersebut juga menggunakan format vertikal 9:16 dan H.264, namun batasan masing-masing platform bisa berbeda.</p></details>
+    </section>
+
+    <footer>Seluruh pemeriksaan berjalan lokal di peramban Anda dan tidak ada data yang dikirim ke pihak lain. Versi 6.1.</footer>
+  </main>
+</div>
+
+<div id="procOverlay" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+  <div class="ov-card">
+    <div class="ov-head"><strong id="ovTitle">Memproses video</strong><span id="ovPct">0%</span></div>
+    <div class="ov-body">
+      <div class="ov-prev">
+        <div class="sk phone-lg" id="ovSk"></div>
+        <canvas id="ovCanvas" width="270" height="480" hidden></canvas>
+      </div>
+      <div class="ov-side">
+        <ol class="ov-steps" id="ovSteps">
+          <li>Membaca video</li>
+          <li>Menyesuaikan ke 1080 x 1920</li>
+          <li>Encode video dan audio</li>
+          <li>Menyelesaikan file</li>
+        </ol>
+        <div class="bar"><i id="ovBar"></i></div>
+        <div class="muted" id="ovTxt" role="status">Menyiapkan</div>
+      </div>
+    </div>
+    <div class="ov-foot"><button class="btn ghost" id="ovCancel" type="button">Batalkan</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement, $=function(i){return document.getElementById(i)};
+
+  // tema: otomatis mengikuti layar, dapat diganti manual
+  var modes=['auto','light','dark'], labels={auto:'Otomatis',light:'Terang',dark:'Gelap'}, mode='auto';
+  function applyTheme(){
+    if(mode==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',mode);
+    $('themeBtn').textContent='Tema: '+labels[mode];
+  }
+  $('themeBtn').addEventListener('click',function(){mode=modes[(modes.indexOf(mode)+1)%3];applyTheme();});
+  applyTheme();
+
+  // skeleton awal
+  setTimeout(function(){ $('pageSkeleton').hidden=true; $('content').hidden=false; },700);
+
+  // penyalin perintah
+  $('copy').addEventListener('click',function(){
+    var t=$('cmd').textContent;
+    var done=function(m){ $('copied').textContent=m; setTimeout(function(){$('copied').textContent='';},2000); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){done('Tersalin')},function(){done('Gagal menyalin')}); }
+    else{ var r=document.createRange(); r.selectNodeContents($('cmd')); var s=getSelection(); s.removeAllRanges(); s.addRange(r); done('Teks terpilih, salin manual'); }
+  });
+
+  // penganalisis
+  var drop=$('drop'), input=$('file');
+  ['dragenter','dragover'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.remove('over')})});
+  drop.addEventListener('drop',function(ev){ if(ev.dataTransfer.files[0]) analyze(ev.dataTransfer.files[0]); });
+  input.addEventListener('change',function(){ if(input.files[0]) analyze(input.files[0]); });
+  $('reset').addEventListener('click',function(){ $('result').hidden=true; drop.hidden=false; input.value=''; });
+
+  function fmtSize(b){ return b>=1048576? (b/1048576).toFixed(1)+' MB' : (b/1024).toFixed(0)+' KB'; }
+  function fmtDur(s){ var m=Math.floor(s/60), r=Math.round(s%60); return m+' mnt '+r+' dtk'; }
+
+  function analyze(file){
+    drop.hidden=true; $('result').hidden=true; $('anSkeleton').hidden=false; setProc(file);
+    var v=document.createElement('video'), url=URL.createObjectURL(file), finished=false;
+    v.preload='metadata'; v.muted=true;
+    function fail(){
+      if(finished) return; finished=true; URL.revokeObjectURL(url);
+      $('anSkeleton').hidden=true; drop.hidden=false;
+      alert('Metadata video tidak dapat dibaca. Pastikan file berformat video yang didukung peramban.');
+    }
+    var timer=setTimeout(fail,12000);
+    v.onerror=function(){clearTimeout(timer);fail();};
+    v.onloadedmetadata=function(){
+      if(finished) return; finished=true; clearTimeout(timer);
+      var w=v.videoWidth,h=v.videoHeight,d=v.duration;
+      URL.revokeObjectURL(url);
+      setTimeout(function(){ render(file,w,h,d); },500);
+    };
+    v.src=url;
+  }
+
+  function render(file,w,h,d){
+    var mbps=(file.size*8/d)/1e6;
+    var ratio=w/h, isVert=Math.abs(ratio-9/16)<0.01;
+    $('fname').textContent=file.name;
+    $('stats').innerHTML=
+      stat('Resolusi',w+' x '+h)+stat('Durasi',fmtDur(d))+stat('Ukuran',fmtSize(file.size))+stat('Bitrate total',mbps.toFixed(1)+' Mbps');
+    var items=[];
+
+    if(w===1080&&h===1920) items.push(['ok','Resolusi','Tepat 1080 x 1920. Tidak perlu penskalaan ulang.']);
+    else if(isVert&&w>1080) items.push(['warn','Resolusi','Rasio sudah 9:16 tetapi resolusi di atas 1080 x 1920. Disarankan diturunkan ke 1080 x 1920 sendiri dengan penskalaan berkualitas.']);
+    else if(isVert) items.push(['warn','Resolusi','Rasio sudah 9:16 tetapi resolusi di bawah 1080 x 1920, sehingga akan tampak lebih lembut.']);
+    else if(ratio>1) items.push(['bad','Rasio','Video berorientasi lanskap. TikTok akan memberi bingkai hitam atau memotongnya. Ubah ke 9:16.']);
+    else items.push(['warn','Rasio','Rasio bukan 9:16. Sesuaikan agar memenuhi layar tanpa potongan.']);
+
+    if(mbps<6) items.push(['bad','Bitrate','Terlalu rendah. Detail sudah hilang sebelum diunggah. Ekspor ulang dari file master pada 12 sampai 20 Mbps.']);
+    else if(mbps<12) items.push(['warn','Bitrate','Agak rendah. Nilai 12 sampai 20 Mbps memberi ruang lebih baik saat dikonversi ulang.']);
+    else if(mbps<=25) items.push(['ok','Bitrate','Berada pada rentang yang baik.']);
+    else items.push(['warn','Bitrate','Sangat tinggi. Tidak memberi keuntungan berarti dan dapat memperlama unggah. Turunkan ke sekitar 16 Mbps.']);
+
+    var n=file.name.toLowerCase();
+    if(/\.mp4$/.test(n)||file.type==='video/mp4') items.push(['ok','Format','Kontainer MP4.']);
+    else if(/\.mov$/.test(n)) items.push(['warn','Format','Berkas MOV. Biasanya dapat diterima, namun MP4 H.264 lebih aman.']);
+    else items.push(['warn','Format','Disarankan mengekspor sebagai MP4 dengan codec H.264.']);
+
+    if(d>600) items.push(['warn','Durasi','Durasi lebih dari 10 menit. Periksa batas durasi pada versi aplikasi TikTok Anda.']);
+
+    var lbl={ok:'Baik',warn:'Perhatian',bad:'Perbaiki'};
+    $('checks').innerHTML=items.map(function(i){
+      return '<li><span class="tag t-'+i[0]+'">'+lbl[i[0]]+'</span><div><strong>'+i[1]+'</strong><br><span class="muted">'+i[2]+'</span></div></li>';
+    }).join('');
+    $('anSkeleton').hidden=true; $('result').hidden=false;
+  }
+  function stat(a,b){ return '<div class="stat"><b>'+a+'</b><span>'+b+'</span></div>'; }
+
+  // pemrosesan video
+  var procFile=null, busy=false;
+  function setProc(f){ procFile=f; $('pName').textContent=f.name+' ('+fmtSize(f.size)+')'; $('pStart').disabled=busy; $('pOut').hidden=true; }
+  $('pFile').addEventListener('change',function(){ if(this.files[0]) setProc(this.files[0]); });
+  $('pStart').addEventListener('click',function(){ if(!procFile||busy) return; var miss=missingFeatures(); if(miss.length){ alert('Peramban ini belum mendukung fitur yang dibutuhkan: '+miss.join(', ')+'. Video tidak diproses agar durasinya tidak berubah. Gunakan Chrome terbaru, atau ekspor lewat aplikasi editor (1080 x 1920, 30 fps, bitrate tinggi).'); return; } runExact(procFile); });
+  function pickMime(){
+    if(!window.MediaRecorder) return '';
+    var c=['video/mp4;codecs=avc1.640029,mp4a.40.2','video/mp4;codecs=avc1,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm'];
+    for(var i=0;i<c.length;i++){ if(MediaRecorder.isTypeSupported(c[i])) return c[i]; }
+    return '';
+  }
+  function setBar(p,t){ $('pBar').style.width=Math.max(0,Math.min(100,p))+'%'; $('pTxt').textContent=t; }
+
+  // tampilan layar penuh saat proses
+  var cancelFn=null, ovFirst=true, ovCx=null, ovTick=0, ovLastT=0;
+  function ovStep(n){ var li=$('ovSteps').children; for(var i=0;i<li.length;i++){ li[i].className = i<n?'done':(i===n?'on':''); } }
+  function ovPct(p){ var r=Math.round(Math.max(0,Math.min(100,p))); $('ovPct').textContent=r+'%'; $('ovBar').style.width=r+'%'; }
+  function ovOpen(){
+    ovFirst=true; ovTick=0; ovLastT=0; $('ovSk').hidden=false; $('ovCanvas').hidden=true; $('ovTxt').textContent='Menyiapkan';
+    ovStep(0); ovPct(0); $('procOverlay').hidden=false; document.body.style.overflow='hidden'; $('ovCancel').focus();
+  }
+  function ovClose(){ $('procOverlay').hidden=true; document.body.style.overflow=''; }
+  function ovFrame(src,p,left){
+    if(ovFirst){ ovFirst=false; ovStep(2); $('ovSk').hidden=true; $('ovCanvas').hidden=false; ovCx=$('ovCanvas').getContext('2d'); }
+    var nowT=performance.now(); if(nowT-ovLastT<250) return; ovLastT=nowT;
+    ovCx.drawImage(src,0,0,270,480);
+    ovPct(p); $('ovTxt').textContent='Sisa sekitar '+left+' detik. Jangan pindah tab.';
+  }
+  $('ovCancel').addEventListener('click',function(){ if(cancelFn) cancelFn(); });
+
+  // proses presisi: durasi dan audio sama persis dengan video asli
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+  function missingFeatures(){
+    var m=[];
+    if(!window.VideoEncoder) m.push('VideoEncoder');
+    if(!window.AudioEncoder) m.push('AudioEncoder');
+    if(!window.VideoFrame) m.push('VideoFrame');
+    if(!window.AudioData) m.push('AudioData');
+    if(!window.Mp4Muxer) m.push('Mp4Muxer (pustaka gagal dimuat, periksa koneksi)');
+    return m;
+  }
+  function canExact(){
+    return !!(window.VideoEncoder&&window.AudioEncoder&&window.VideoFrame&&window.AudioData&&window.Mp4Muxer);
+  }
+  async function runExact(file){
+    var bps0=parseInt($('pBitrate').value,10)*1e6, fps0=parseInt($('pFps').value,10), mode=$('pFit').value;
+    var fpsList=fps0===60?[60,30]:[30];
+    var bpsList=[bps0,12e6,8e6].filter(function(b,i,a){ return b<=bps0&&a.indexOf(b)===i; });
+    var cands=fps0===60?['avc1.64002A','avc1.640032','avc1.4D402A','avc1.4D0033','avc1.42002A']:['avc1.640028','avc1.64002A','avc1.640032','avc1.4D0028','avc1.4D402A','avc1.4D0033','avc1.420028','avc1.42002A'];
+    var accs=['no-preference','prefer-software','prefer-hardware'];
+    var vcfg=null, fps=fps0, bps=bps0;
+    search:
+    for(var fi=0;fi<fpsList.length;fi++){
+      for(var bi=0;bi<bpsList.length;bi++){
+        for(var ci=0;ci<cands.length;ci++){
+          for(var ai=0;ai<accs.length;ai++){
+            var tryCfg={codec:cands[ci],width:1080,height:1920,bitrate:bpsList[bi],framerate:fpsList[fi],hardwareAcceleration:accs[ai]};
+            try{ var sv=await VideoEncoder.isConfigSupported(tryCfg); if(sv&&sv.supported){ vcfg=tryCfg; fps=fpsList[fi]; bps=bpsList[bi]; break search; } }catch(e){}
+          }
+        }
+      }
+    }
+    if(!vcfg){ alert('Encoder H.264 tidak tersedia di peramban atau perangkat ini, jadi video tidak diproses agar durasinya tidak berubah. Gunakan Chrome terbaru, atau ekspor lewat aplikasi editor (1080 x 1920, 30 fps, bitrate tinggi).'); return; }
+    var note='';
+    if(fps!==fps0) note+=' Frame rate diturunkan ke '+fps+' fps karena perangkat tidak mendukung '+fps0+' fps.';
+    if(bps!==bps0) note+=' Bitrate diturunkan ke '+(bps/1e6)+' Mbps karena perangkat tidak mendukung bitrate yang dipilih.';
+
+    busy=true; $('pStart').disabled=true; $('pOut').hidden=true; $('pProg').hidden=false; setBar(0,'Menyiapkan'); ovOpen();
+    var url=URL.createObjectURL(file), v=document.createElement('video');
+    // video dipasang di halaman (hampir tak terlihat) agar peramban tetap men-decode frame; video tidak diputar
+    v.muted=true; v.defaultMuted=true; v.playsInline=true; v.preload='auto';
+    v.setAttribute('playsinline',''); v.setAttribute('muted','');
+    v.style.cssText='position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none;z-index:-1';
+    document.body.appendChild(v);
+    var cv=document.createElement('canvas'); cv.width=1080; cv.height=1920; var cx=cv.getContext('2d',{alpha:false});
+    var cancelled=false, loopDone=false, venc=null, aenc=null, err=null, wl=null, watch=0;
+    function cleanup(){
+      cancelled=true; clearInterval(watch);
+      try{ if(venc&&venc.state!=='closed') venc.close(); }catch(e){}
+      try{ if(aenc&&aenc.state!=='closed') aenc.close(); }catch(e){}
+      try{ v.pause(); }catch(e){}
+      try{ v.removeAttribute('src'); v.load(); if(v.parentNode) v.parentNode.removeChild(v); }catch(e){}
+      URL.revokeObjectURL(url);
+      try{ if(wl) wl.release().catch(function(){}); }catch(e){}
+    }
+    function fail(msg){ if(cancelled) return; cleanup(); ovClose(); $('pProg').hidden=true; busy=false; $('pStart').disabled=false; if(msg) alert(msg); }
+    cancelFn=function(){ fail(''); };
+
+    try{
+      // jaga layar tetap menyala agar proses tidak ditangguhkan
+      try{ if(navigator.wakeLock) wl=await navigator.wakeLock.request('screen'); }catch(e){ wl=null; }
+      v.src=url;
+      await new Promise(function(ok,no){
+        var t=setTimeout(function(){ no(new Error('Video terlalu lama dimuat. Coba lagi.')); },20000);
+        v.onloadedmetadata=function(){ clearTimeout(t); ok(); };
+        v.onerror=function(){ clearTimeout(t); no(new Error('Video tidak dapat dibaca oleh peramban.')); };
+      });
+      var dur=v.duration, vw=v.videoWidth, vh=v.videoHeight;
+      if(!isFinite(dur)||dur<=0||!vw||!vh) throw new Error('Metadata video tidak valid.');
+      var sc=mode==='crop'? Math.max(1080/vw,1920/vh) : Math.min(1080/vw,1920/vh), dw=vw*sc, dh=vh*sc;
+
+      // audio: didekode utuh lalu dienkode, tidak bergantung pada kecepatan pemutaran
+      ovStep(1); $('ovTxt').textContent='Menyiapkan audio';
+      var ab=null, ch=0, acodec=null, acfg=null, audioNote='';
+      try{
+        var AC=window.AudioContext||window.webkitAudioContext, ac=new AC({sampleRate:48000});
+        ab=await ac.decodeAudioData(await file.arrayBuffer()); ac.close();
+      }catch(e){ ab=null; }
+      if(cancelled) return;
+      if(ab){
+        ch=Math.min(2,ab.numberOfChannels);
+        acfg={codec:'mp4a.40.2',sampleRate:ab.sampleRate,numberOfChannels:ch,bitrate:256000};
+        var s1=await AudioEncoder.isConfigSupported(acfg).catch(function(){ return {supported:false}; });
+        if(s1.supported) acodec='aac';
+        else{
+          acfg={codec:'opus',sampleRate:ab.sampleRate,numberOfChannels:ch,bitrate:192000};
+          var s2=await AudioEncoder.isConfigSupported(acfg).catch(function(){ return {supported:false}; });
+          if(s2.supported){ acodec='opus'; audioNote=' Audio memakai Opus karena AAC tidak tersedia di peramban ini.'; }
+        }
+        if(!acodec) audioNote=' Audio tidak dapat dienkode di peramban ini.';
+      }else audioNote=' Audio tidak terbaca atau video tanpa suara.';
+
+      var mopt={target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:1080,height:1920},fastStart:'in-memory'};
+      if(acodec) mopt.audio={codec:acodec,numberOfChannels:ch,sampleRate:ab.sampleRate};
+      var muxer=new Mp4Muxer.Muxer(mopt);
+      venc=new VideoEncoder({output:function(c,m){ muxer.addVideoChunk(c,m); },error:function(e){ err=e; }});
+      venc.configure(vcfg);
+
+      if(acodec){
+        aenc=new AudioEncoder({output:function(c,m){ muxer.addAudioChunk(c,m); },error:function(e){ err=e; }});
+        aenc.configure(acfg);
+        var step=4800, total=ab.length, chans=[];
+        for(var c=0;c<ch;c++) chans.push(ab.getChannelData(c));
+        for(var i=0;i<total&&!cancelled;i+=step){
+          var n=Math.min(step,total-i), data=new Float32Array(n*ch);
+          for(var k=0;k<ch;k++) data.set(chans[k].subarray(i,i+n),k*n);
+          var ad=new AudioData({format:'f32-planar',sampleRate:ab.sampleRate,numberOfFrames:n,numberOfChannels:ch,timestamp:Math.round(i/ab.sampleRate*1e6),data:data});
+          aenc.encode(ad); ad.close();
+          while(aenc.encodeQueueSize>30&&!cancelled) await sleep(5);
+        }
+        ab=null; chans=null;
+      }
+      if(cancelled) return;
+
+      // video: frame ditempatkan pada grid waktu tetap (CFR). Frame yang terlewat
+      // (umum di Android) diisi dengan frame sebelumnya, sehingga durasi tetap sama dengan aslinya.
+      ovStep(2);
+      // video TIDAK diputar: tiap frame diambil dengan melompat (seek) ke waktunya, lalu digambar.
+      // Hasilnya tepat satu frame per langkah pada grid waktu tetap (CFR), tanpa frame terlewat
+      // walau perangkat lambat, sehingga video hasil unduhan lancar.
+      var nf=0, drawn=false, needBg=(dw<1079.5||dh<1919.5), tStart=Date.now();
+      var totalF=Math.max(1,Math.round(dur*fps)), lastT=Math.max(0,dur-0.01);
+      function enc(){
+        var vf=new VideoFrame(cv,{timestamp:Math.round(nf/fps*1e6),duration:Math.round(1e6/fps)});
+        venc.encode(vf,{keyFrame:nf%(fps*2)===0}); vf.close(); nf++;
+      }
+      function seekTo(t){
+        return new Promise(function(ok,no){
+          if(Math.abs(v.currentTime-t)<1e-6&&v.readyState>=2){ ok(); return; }
+          var fin=false, to=setTimeout(function(){ if(!fin){ fin=true; v.onseeked=null; no(new Error('Pencarian frame video macet. Coba lagi dengan layar tetap menyala.')); } },20000);
+          v.onseeked=function(){ if(fin) return; fin=true; clearTimeout(to); v.onseeked=null; ok(); };
+          v.onerror=function(){ if(fin) return; fin=true; clearTimeout(to); no(new Error('Video gagal dibaca saat proses.')); };
+          try{ v.currentTime=t; }catch(e){ fin=true; clearTimeout(to); no(e); }
+        });
+      }
+      while(nf<totalF&&!cancelled){
+        var tt=Math.min(lastT,nf/fps+0.002);
+        await seekTo(tt);
+        if(cancelled) break;
+        if(err) throw err;
+        if(needBg){ cx.fillStyle='#000'; cx.fillRect(0,0,1080,1920); }
+        cx.drawImage(v,(1080-dw)/2,(1920-dh)/2,dw,dh);
+        drawn=true;
+        var done=nf, left=Math.max(0,Math.ceil((Date.now()-tStart)/1000/Math.max(1,done)*(totalF-done)));
+        enc();
+        ovFrame(cv,Math.min(99,done/totalF*100),left);
+        while(venc.encodeQueueSize>8&&!cancelled) await sleep(4);
+      }
+      loopDone=true;
+      if(cancelled) return;
+      if(!drawn) throw new Error('Tidak ada frame video yang berhasil dibaca.');
+
+      // pastikan jumlah frame sesuai durasi asli (isi sisa di akhir dengan frame terakhir)
+      var totalF=Math.round(dur*fps);
+      while(nf<totalF&&!cancelled){ enc(); if(venc.encodeQueueSize>20) await sleep(5); }
+
+      ovStep(3); $('ovTxt').textContent='Menyelesaikan file';
+      await venc.flush(); if(aenc) await aenc.flush();
+      if(err) throw err;
+      muxer.finalize();
+      var blob=new Blob([muxer.target.buffer],{type:'video/mp4'});
+      var out=URL.createObjectURL(blob), base=file.name.replace(/\.[^.]+$/,'');
+      cleanup();
+      var pv=$('pVideo');
+      pv.onloadedmetadata=function(){
+        $('pInfo').textContent='Durasi asli '+dur.toFixed(2)+' detik, durasi hasil '+pv.duration.toFixed(2)+' detik. Ukuran '+fmtSize(blob.size)+', bitrate sekitar '+(blob.size*8/dur/1e6).toFixed(1)+' Mbps, '+fps+' fps, MP4 1080 x 1920.'+audioNote+note;
+      };
+      pv.src=out;
+      $('pInfo').textContent='Ukuran '+fmtSize(blob.size)+', MP4 1080 x 1920.'+audioNote+note;
+      var a=$('pDl'); a.href=out; a.download='tiktok_ready_'+base+'.mp4';
+      $('pWarn').hidden=true;
+      ovStep(4); ovPct(100); setTimeout(ovClose,700);
+      $('pProg').hidden=true; $('pOut').hidden=false; busy=false; $('pStart').disabled=false;
+    }catch(e){
+      fail(e&&e.message?e.message:'Proses gagal. Coba lagi atau gunakan Chrome atau Edge terbaru.');
+    }
+  }
+
+
+  function runProc(file){
+    var mime=pickMime();
+    if(!mime){ alert('Peramban ini tidak mendukung perekaman video. Gunakan Chrome atau Edge versi terbaru.'); return; }
+    busy=true; $('pStart').disabled=true; $('pOut').hidden=true; $('pProg').hidden=false; setBar(0,'Menyiapkan'); ovOpen();
+    var bps=parseInt($('pBitrate').value,10)*1e6, fps=parseInt($('pFps').value,10), mode=$('pFit').value;
+    var url=URL.createObjectURL(file), v=document.createElement('video');
+    var cv=document.createElement('canvas'); cv.width=1080; cv.height=1920;
+    var cx=cv.getContext('2d'), ac=null, rec=null, chunks=[], raf=0, stopped=false;
+    v.playsInline=true; v.preload='auto'; v.src=url; cancelFn=function(){ abort(''); };
+
+    function cleanup(){ stopped=true; cancelAnimationFrame(raf); try{ if(ac) ac.close(); }catch(e){} URL.revokeObjectURL(url); }
+    function abort(msg){
+      if(rec&&rec.state!=='inactive'){ rec.onstop=null; try{rec.stop();}catch(e){} }
+      cleanup(); ovClose(); $('pProg').hidden=true; busy=false; $('pStart').disabled=false; if(msg) alert(msg);
+    }
+    function draw(){
+      var vw=v.videoWidth, vh=v.videoHeight;
+      var s=mode==='crop'? Math.max(1080/vw,1920/vh) : Math.min(1080/vw,1920/vh);
+      var w=vw*s, h=vh*s;
+      cx.fillStyle='#000'; cx.fillRect(0,0,1080,1920);
+      cx.drawImage(v,(1080-w)/2,(1920-h)/2,w,h);
+      var left=Math.max(0,Math.ceil(v.duration-v.currentTime));
+      setBar(v.currentTime/v.duration*100,'Memproses, sisa sekitar '+left+' detik. Jangan pindah tab.');
+      ovFrame(cv,v.currentTime/v.duration*100,left);
+      if(!stopped) raf=requestAnimationFrame(draw);
+    }
+    function finish(){
+      var dur=v.duration;
+      cleanup();
+      var ext=mime.indexOf('mp4')>-1?'mp4':'webm';
+      var blob=new Blob(chunks,{type:ext==='mp4'?'video/mp4':'video/webm'});
+      var out=URL.createObjectURL(blob);
+      var base=file.name.replace(/\.[^.]+$/,'');
+      $('pVideo').src=out;
+      var a=$('pDl'); a.href=out; a.download='tiktok_ready_'+base+'.'+ext;
+      $('pInfo').textContent='Ukuran '+fmtSize(blob.size)+', bitrate sekitar '+(blob.size*8/dur/1e6).toFixed(1)+' Mbps, format '+ext.toUpperCase()+', 1080 x 1920.';
+      $('pWarn').textContent='Hasil dibuat dengan mode cadangan (rekam ulang) karena peramban atau perangkat ini tidak mendukung encoder H.264 presisi. Durasi dan sinkron suara dapat berbeda dari video asli.'+(ext==='webm'?' Format WebM juga kurang cocok untuk TikTok.':''); $('pWarn').hidden=false;
+      ovStep(4); ovPct(100); setTimeout(ovClose,700);
+      $('pProg').hidden=true; $('pOut').hidden=false; busy=false; $('pStart').disabled=false;
+    }
+    v.onerror=function(){ abort('Video tidak dapat dibaca oleh peramban.'); };
+    v.onloadedmetadata=function(){
+      try{
+        ovStep(1); var stream=cv.captureStream(fps);
+        try{
+          var AC=window.AudioContext||window.webkitAudioContext;
+          ac=new AC(); if(ac.resume) ac.resume();
+          var src=ac.createMediaElementSource(v), dest=ac.createMediaStreamDestination();
+          src.connect(dest);
+          dest.stream.getAudioTracks().forEach(function(t){ stream.addTrack(t); });
+        }catch(e){ ac=null; }
+        rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:bps,audioBitsPerSecond:256000});
+        rec.ondataavailable=function(e){ if(e.data&&e.data.size) chunks.push(e.data); };
+        rec.onstop=finish;
+        v.onended=function(){ if(rec.state!=='inactive') rec.stop(); };
+        rec.start(1000);
+        var p=v.play(); if(p&&p.catch) p.catch(function(){ abort('Pemutaran otomatis diblokir. Klik Mulai proses sekali lagi.'); });
+        draw();
+      }catch(e){ abort('Proses gagal dimulai. Coba Chrome atau Edge terbaru.'); }
+    };
+  }
+  // ===== foto ke vektor: kuantisasi warna, pemisahan bagian, pelacakan kontur =====
+  function vecTrace(rgba,W,H,o,prog){
+    var N=W*H, eps=o.eps, minArea=o.minArea, smooth=o.smooth, t0=0;
+    function tick(){ var n=Date.now(); if(n-t0>40){ t0=n; return new Promise(function(r){ setTimeout(r,0); }); } return null; }
+    function fmt(n){ return String(Math.round(n*10)/10); }
+    return (async function(){
+      var i,x,y,p,q,w;
+      var op=new Uint8Array(N), pr=new Uint8Array(N), pg=new Uint8Array(N), pb=new Uint8Array(N), lab=new Uint8Array(N), opaque=0;
+      for(i=0;i<N;i++){ if(rgba[i*4+3]>=128){ op[i]=1; opaque++; } }
+      if(!opaque) throw new Error('Foto ini sepenuhnya transparan.');
+
+      // 1. haluskan noise ringan (rata-rata 3x3 pada piksel buram)
+      for(y=0;y<H;y++){
+        for(x=0;x<W;x++){
+          p=y*W+x; if(!op[p]) continue;
+          var sr=0,sg=0,sb=0,c=0;
+          for(var dy=-1;dy<=1;dy++){ var yy=y+dy; if(yy<0||yy>=H) continue;
+            for(var dx=-1;dx<=1;dx++){ var xx=x+dx; if(xx<0||xx>=W) continue; q=yy*W+xx; if(!op[q]) continue; sr+=rgba[q*4]; sg+=rgba[q*4+1]; sb+=rgba[q*4+2]; c++; } }
+          pr[p]=sr/c; pg[p]=sg/c; pb[p]=sb/c;
+        }
+        if((y&31)===0){ w=tick(); if(w) await w; prog(0.02+0.10*y/H,'Menghaluskan noise'); }
+      }
+
+      // 2. k-means++ untuk palet warna
+      var step=Math.max(1,Math.floor(opaque/25000)), sm=[], cnt=0;
+      for(i=0;i<N;i++){ if(op[i]){ if(cnt%step===0) sm.push(i); cnt++; } }
+      var S=sm.length, K=Math.max(2,Math.min(o.colors,S));
+      var seed=1234567; function rnd(){ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; }
+      var cr=new Float32Array(K), cg=new Float32Array(K), cb=new Float32Array(K), d2=new Float32Array(S), s, k;
+      for(s=0;s<S;s++) d2[s]=1e12;
+      var f0=sm[Math.floor(rnd()*S)]; cr[0]=pr[f0]; cg[0]=pg[f0]; cb[0]=pb[f0];
+      for(k=1;k<K;k++){
+        var tot=0;
+        for(s=0;s<S;s++){ p=sm[s]; var a=pr[p]-cr[k-1], b=pg[p]-cg[k-1], cc=pb[p]-cb[k-1], dd=a*a+b*b+cc*cc; if(dd<d2[s]) d2[s]=dd; tot+=d2[s]; }
+        var r=rnd()*tot, acc=0, pick=S-1;
+        for(s=0;s<S;s++){ acc+=d2[s]; if(acc>=r){ pick=s; break; } }
+        p=sm[pick]; cr[k]=pr[p]; cg[k]=pg[p]; cb[k]=pb[p];
+      }
+      for(var it=0;it<8;it++){
+        var ar=new Float64Array(K), ag=new Float64Array(K), ab=new Float64Array(K), an=new Int32Array(K);
+        for(s=0;s<S;s++){
+          p=sm[s]; var best=0, bd=1e12;
+          for(k=0;k<K;k++){ var e1=pr[p]-cr[k], e2=pg[p]-cg[k], e3=pb[p]-cb[k], ed=e1*e1+e2*e2+e3*e3; if(ed<bd){ bd=ed; best=k; } }
+          ar[best]+=pr[p]; ag[best]+=pg[p]; ab[best]+=pb[p]; an[best]++;
+        }
+        for(k=0;k<K;k++){ if(an[k]){ cr[k]=ar[k]/an[k]; cg[k]=ag[k]/an[k]; cb[k]=ab[k]/an[k]; } }
+        w=tick(); if(w) await w; prog(0.12+0.06*(it+1)/8,'Menentukan palet warna');
+      }
+      for(i=0;i<N;i++){
+        if(!op[i]){ lab[i]=255; }
+        else{
+          var bb=0, bdist=1e12;
+          for(k=0;k<K;k++){ var f1=pr[i]-cr[k], f2=pg[i]-cg[k], f3=pb[i]-cb[k], fd=f1*f1+f2*f2+f3*f3; if(fd<bdist){ bdist=fd; bb=k; } }
+          lab[i]=bb;
+        }
+        if((i&65535)===0){ w=tick(); if(w) await w; prog(0.18+0.10*i/N,'Memetakan warna'); }
+      }
+
+      // 3. pisahkan menjadi bagian (komponen terhubung), gabungkan bagian yang terlalu kecil
+      var cid=new Int32Array(N), order=new Int32Array(N), cStart=[], cLen=[], cLab=[];
+      function ccl(){
+        cid.fill(-1); cStart.length=0; cLen.length=0; cLab.length=0;
+        var tail=0, nc=0;
+        for(var s0=0;s0<N;s0++){
+          if(cid[s0]!==-1) continue;
+          var L=lab[s0], start=tail, head=tail, pp, qq, xx;
+          order[tail++]=s0; cid[s0]=nc;
+          while(head<tail){
+            pp=order[head++]; xx=pp%W;
+            if(pp>=W){ qq=pp-W; if(cid[qq]===-1&&lab[qq]===L){ cid[qq]=nc; order[tail++]=qq; } }
+            if(pp<N-W){ qq=pp+W; if(cid[qq]===-1&&lab[qq]===L){ cid[qq]=nc; order[tail++]=qq; } }
+            if(xx>0){ qq=pp-1; if(cid[qq]===-1&&lab[qq]===L){ cid[qq]=nc; order[tail++]=qq; } }
+            if(xx<W-1){ qq=pp+1; if(cid[qq]===-1&&lab[qq]===L){ cid[qq]=nc; order[tail++]=qq; } }
+          }
+          cStart.push(start); cLen.push(tail-start); cLab.push(L); nc++;
+        }
+        return nc;
+      }
+      var nc=ccl(), nb=new Int32Array(256), c;
+      prog(0.30,'Memisahkan bagian foto');
+      for(c=0;c<nc;c++){
+        if(cLab[c]===255||cLen[c]>=minArea) continue;
+        var st=cStart[c], ln=cLen[c], touched=[], j;
+        for(j=st;j<st+ln;j++){
+          p=order[j]; x=p%W; y=(p/W)|0;
+          if(y>0){ q=p-W; if(cid[q]!==c&&lab[q]!==255){ nb[lab[q]]++; touched.push(lab[q]); } }
+          if(y<H-1){ q=p+W; if(cid[q]!==c&&lab[q]!==255){ nb[lab[q]]++; touched.push(lab[q]); } }
+          if(x>0){ q=p-1; if(cid[q]!==c&&lab[q]!==255){ nb[lab[q]]++; touched.push(lab[q]); } }
+          if(x<W-1){ q=p+1; if(cid[q]!==c&&lab[q]!==255){ nb[lab[q]]++; touched.push(lab[q]); } }
+        }
+        var bl=-1, bc=0;
+        for(j=0;j<touched.length;j++){ if(nb[touched[j]]>bc){ bc=nb[touched[j]]; bl=touched[j]; } }
+        for(j=0;j<touched.length;j++) nb[touched[j]]=0;
+        if(bl>=0){ for(j=st;j<st+ln;j++) lab[order[j]]=bl; }
+      }
+      nc=ccl();
+      w=tick(); if(w) await w;
+
+      // 4. lacak batas tiap bagian, sederhanakan, ubah menjadi path
+      var W1=W+1;
+      function dpOpen(pts){
+        var n=pts.length; if(n<3) return pts;
+        var keep=new Uint8Array(n); keep[0]=1; keep[n-1]=1;
+        var stack=[0,n-1], a, b, m, idx, maxd, ax, ay, dx, dy, L, d;
+        while(stack.length){
+          b=stack.pop(); a=stack.pop(); ax=pts[a][0]; ay=pts[a][1]; dx=pts[b][0]-ax; dy=pts[b][1]-ay; L=Math.sqrt(dx*dx+dy*dy); maxd=0; idx=-1;
+          for(m=a+1;m<b;m++){
+            d=L===0? Math.sqrt(Math.pow(pts[m][0]-ax,2)+Math.pow(pts[m][1]-ay,2)) : Math.abs(dy*(pts[m][0]-ax)-dx*(pts[m][1]-ay))/L;
+            if(d>maxd){ maxd=d; idx=m; }
+          }
+          if(maxd>eps&&idx>0){ keep[idx]=1; stack.push(a,idx,idx,b); }
+        }
+        var out=[]; for(m=0;m<n;m++){ if(keep[m]) out.push(pts[m]); } return out;
+      }
+      function simplifyLoop(pts){
+        // buang titik segaris
+        var n=pts.length, q2=[], i2;
+        for(i2=0;i2<n;i2++){
+          var pa=pts[(i2+n-1)%n], pc=pts[i2], pn=pts[(i2+1)%n];
+          if((pc[0]-pa[0])*(pn[1]-pc[1])-(pc[1]-pa[1])*(pn[0]-pc[0])!==0) q2.push(pc);
+        }
+        if(q2.length<4) return q2;
+        var far=0, fd=-1, i3;
+        for(i3=1;i3<q2.length;i3++){ var ddx=q2[i3][0]-q2[0][0], ddy=q2[i3][1]-q2[0][1], dd2=ddx*ddx+ddy*ddy; if(dd2>fd){ fd=dd2; far=i3; } }
+        var c1=q2.slice(0,far+1), c2=q2.slice(far).concat([q2[0]]);
+        var s1=dpOpen(c1), s2=dpOpen(c2);
+        return s1.concat(s2.slice(1,-1));
+      }
+      function polyArea(pl){ var ar2=0, n=pl.length, i4; for(i4=0;i4<n;i4++){ var u=pl[i4], v2=pl[(i4+1)%n]; ar2+=u[0]*v2[1]-v2[0]*u[1]; } return Math.abs(ar2)/2; }
+      function polyPath(pl){
+        var n=pl.length, i5;
+        if(!smooth||n<3){
+          var t=['M'+fmt(pl[0][0])+' '+fmt(pl[0][1])];
+          for(i5=1;i5<n;i5++) t.push('L'+fmt(pl[i5][0])+' '+fmt(pl[i5][1]));
+          return t.join('')+'Z';
+        }
+        var R=3, A=[], B=[];
+        for(i5=0;i5<n;i5++){
+          var P=pl[i5], Pp=pl[(i5+n-1)%n], Pn=pl[(i5+1)%n];
+          var l1=Math.sqrt(Math.pow(Pp[0]-P[0],2)+Math.pow(Pp[1]-P[1],2)), l2=Math.sqrt(Math.pow(Pn[0]-P[0],2)+Math.pow(Pn[1]-P[1],2));
+          var t1=Math.min(0.5,R/(l1||1)), t2=Math.min(0.5,R/(l2||1));
+          A.push([P[0]+(Pp[0]-P[0])*t1, P[1]+(Pp[1]-P[1])*t1]);
+          B.push([P[0]+(Pn[0]-P[0])*t2, P[1]+(Pn[1]-P[1])*t2]);
+        }
+        var d=['M'+fmt(B[0][0])+' '+fmt(B[0][1])];
+        for(i5=1;i5<n;i5++) d.push('L'+fmt(A[i5][0])+' '+fmt(A[i5][1])+'Q'+fmt(pl[i5][0])+' '+fmt(pl[i5][1])+' '+fmt(B[i5][0])+' '+fmt(B[i5][1]));
+        d.push('L'+fmt(A[0][0])+' '+fmt(A[0][1])+'Q'+fmt(pl[0][0])+' '+fmt(pl[0][1])+' '+fmt(B[0][0])+' '+fmt(B[0][1])+'Z');
+        return d.join('');
+      }
+      function traceComp(st2,ln2,id){
+        var eA=[], eB=[], nxt=[], map=new Map(), ne=0, j2;
+        function addE(a,b){ eA.push(a); eB.push(b); var h=map.get(a); nxt.push(h===undefined?-1:h); map.set(a,ne); ne++; }
+        for(j2=st2;j2<st2+ln2;j2++){
+          var pp=order[j2], xx=pp%W, yy=(pp/W)|0;
+          if(yy===0||cid[pp-W]!==id) addE(yy*W1+xx, yy*W1+xx+1);
+          if(xx===W-1||cid[pp+1]!==id) addE(yy*W1+xx+1, (yy+1)*W1+xx+1);
+          if(yy===H-1||cid[pp+W]!==id) addE((yy+1)*W1+xx+1, (yy+1)*W1+xx);
+          if(xx===0||cid[pp-1]!==id) addE((yy+1)*W1+xx, yy*W1+xx);
+        }
+        var used=new Uint8Array(ne), parts=[], e0;
+        for(e0=0;e0<ne;e0++){
+          if(used[e0]) continue;
+          var loop=[], e=e0;
+          while(e!==-1){
+            used[e]=1; var ka=eA[e]; loop.push([ka%W1, (ka/W1)|0]);
+            var kb=eB[e], nx=map.get(kb), found=-1;
+            while(nx!==undefined&&nx!==-1){ if(!used[nx]){ found=nx; break; } nx=nxt[nx]; }
+            e=found;
+          }
+          if(loop.length<4) continue;
+          var pl=simplifyLoop(loop);
+          if(pl.length<3||polyArea(pl)<1) continue;
+          parts.push(polyPath(pl));
+        }
+        return parts.join('');
+      }
+
+      var items=[], bgIdx=-1, bgLen=0;
+      for(c=0;c<nc;c++){
+        if(cLab[c]===255) continue;
+        if(cLen[c]>bgLen){ bgLen=cLen[c]; bgIdx=c; }
+      }
+      var hex=function(v){ v=Math.max(0,Math.min(255,Math.round(v))); return (v<16?'0':'')+v.toString(16); };
+      var bgColor='';
+      for(c=0;c<nc;c++){
+        if(cLab[c]===255) continue;
+        var st3=cStart[c], ln3=cLen[c], mr=0, mg=0, mb=0, jj;
+        for(jj=st3;jj<st3+ln3;jj++){ var pj=order[jj]*4; mr+=rgba[pj]; mg+=rgba[pj+1]; mb+=rgba[pj+2]; }
+        var fill='#'+hex(mr/ln3)+hex(mg/ln3)+hex(mb/ln3);
+        if(c===bgIdx) bgColor=fill;
+        var dstr=traceComp(st3,ln3,c);
+        if(dstr) items.push({d:dstr,fill:fill,area:ln3});
+        if((c&15)===0){ w=tick(); if(w) await w; prog(0.32+0.66*c/nc,'Melacak bentuk bagian ('+(c+1)+' dari '+nc+')'); }
+      }
+      items.sort(function(a,b){ return b.area-a.area; });
+      return {items:items, W:W, H:H, bg:(opaque===N?bgColor:''), alpha:opaque<N};
+    })();
+  }
+  function vecToSvg(res,title,seam){
+    var esc=function(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+    var out=['<?xml version="1.0" encoding="UTF-8"?>','<svg xmlns="http://www.w3.org/2000/svg" width="'+res.W+'" height="'+res.H+'" viewBox="0 0 '+res.W+' '+res.H+'">','<title>'+esc(title)+'</title>'];
+    if(res.bg) out.push('<rect id="latar" x="0" y="0" width="'+res.W+'" height="'+res.H+'" fill="'+res.bg+'"/>');
+    res.items.forEach(function(it,i){
+      out.push('<path id="bagian-'+(i+1)+'" fill="'+it.fill+'" fill-rule="evenodd"'+(seam?' stroke="'+it.fill+'" stroke-width="0.8" stroke-linejoin="round"':'')+' d="'+it.d+'"/>');
+    });
+    out.push('</svg>');
+    return out.join('\n');
+  }
+
+  // antarmuka foto ke vektor
+  var vFileObj=null, vBusy=false, vUrls=[];
+  function vSetBar(p,t){ $('vBar').style.width=Math.max(0,Math.min(100,p*100))+'%'; $('vTxt').textContent=t; }
+  function vFreeUrls(){ vUrls.forEach(function(u){ URL.revokeObjectURL(u); }); vUrls=[]; }
+  $('vFile').addEventListener('change',function(){
+    if(!this.files[0]) return;
+    vFileObj=this.files[0]; $('vName').textContent=vFileObj.name+' ('+fmtSize(vFileObj.size)+')'; $('vStart').disabled=vBusy; $('vOut').hidden=true;
+  });
+  $('vStart').addEventListener('click',function(){ if(vFileObj&&!vBusy) runVec(vFileObj); });
+  $('vCopy').addEventListener('click',function(){
+    var t=window.__vecSvg||''; var done=function(m){ $('vCopied').textContent=m; setTimeout(function(){ $('vCopied').textContent=''; },2200); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ done('Kode tersalin'); },function(){ done('Gagal menyalin, gunakan tombol unduh'); }); }
+    else done('Penyalinan tidak didukung, gunakan tombol unduh');
+  });
+  async function runVec(file){
+    vBusy=true; $('vStart').disabled=true; $('vOut').hidden=true; $('vProg').hidden=false; vSetBar(0.01,'Membaca foto'); vFreeUrls();
+    var t0=Date.now();
+    try{
+      var url=URL.createObjectURL(file); vUrls.push(url);
+      var img=new Image();
+      await new Promise(function(ok,no){ img.onload=ok; img.onerror=function(){ no(new Error('Foto tidak dapat dibaca. Gunakan JPG, PNG, atau WebP.')); }; img.src=url; });
+      var P={low:{max:640,eps:1.2,min:30},mid:{max:900,eps:0.9,min:16},high:{max:1280,eps:0.7,min:8}}[$('vDetail').value];
+      var iw=img.naturalWidth, ih=img.naturalHeight; if(!iw||!ih) throw new Error('Ukuran foto tidak valid.');
+      var sc=Math.min(1,P.max/Math.max(iw,ih)), W=Math.max(2,Math.round(iw*sc)), H=Math.max(2,Math.round(ih*sc));
+      var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+      var cx=cv.getContext('2d',{willReadFrequently:true}); cx.imageSmoothingQuality='high'; cx.drawImage(img,0,0,W,H);
+      var data=cx.getImageData(0,0,W,H).data;
+      var res=await vecTrace(data,W,H,{colors:parseInt($('vColors').value,10),eps:P.eps,minArea:P.min,smooth:$('vEdge').value==='smooth'},vSetBar);
+      if(!res.items.length) throw new Error('Tidak ada bentuk yang bisa dibuat dari foto ini.');
+      vSetBar(0.99,'Menyusun file');
+      var base=file.name.replace(/\.[^.]+$/,'');
+      var svg=vecToSvg(res,base,$('vSeam').value==='1');
+      window.__vecSvg=svg;
+      var bSvg=new Blob([svg],{type:'image/svg+xml'}), bXml=new Blob([svg],{type:'application/xml'});
+      var uSvg=URL.createObjectURL(bSvg), uXml=URL.createObjectURL(bXml); vUrls.push(uSvg,uXml);
+      $('vOrig').src=url; $('vPrev').src=uSvg;
+      var a1=$('vDlSvg'); a1.href=uSvg; a1.download=base+'_vektor.svg';
+      var a2=$('vDlXml'); a2.href=uXml; a2.download=base+'_vektor.xml';
+      $('vStats').innerHTML=stat('Jumlah bagian',res.items.length.toLocaleString('id-ID'))+stat('Ukuran vektor',res.W+' x '+res.H)+stat('Ukuran SVG',fmtSize(bSvg.size))+stat('Waktu proses',((Date.now()-t0)/1000).toFixed(1)+' dtk');
+      var wn=$('vWarn');
+      if(res.items.length>2500){ wn.textContent='Jumlah bagian cukup banyak dan bisa memberatkan Alight Motion. Coba tingkat detail Rendah atau kurangi jumlah warna.'; wn.hidden=false; }
+      else if(res.alpha){ wn.textContent='Bagian transparan pada foto dipertahankan, jadi tidak ada latar penuh di belakang bentuk.'; wn.hidden=false; }
+      else wn.hidden=true;
+      $('vProg').hidden=true; $('vOut').hidden=false;
+    }catch(e){
+      $('vProg').hidden=true; alert(e&&e.message?e.message:'Proses gagal. Coba foto lain atau tingkat detail yang lebih rendah.');
+    }
+    vBusy=false; $('vStart').disabled=!vFileObj;
+  }
+})();
+</script>
+</body>
+</html>
